@@ -10,7 +10,7 @@ class CandleManager(object):
         myDB.connect()
         self.creator.candleClass.create_table(True)
         batch = 1000
-        
+
         while True:
             try:
                 lastCandle = self.creator.candleClass.select().order_by(self.creator.candleClass.id.desc()).get()
