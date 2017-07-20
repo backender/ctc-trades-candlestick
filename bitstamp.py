@@ -1,6 +1,6 @@
-from candleManager import *
+from candle_creator import *
 from models import *
 
-creator = CandleCreator(BitstampCandle, 60)
-manager = CandleManager(creator, BitstampTrade, "Bitstamp")
-manager.run()
+manager = CandleManager(BitstampCandle, 60)
+creator = CandleCreator(manager, BitstampTrade, "Bitstamp")
+creator.run()

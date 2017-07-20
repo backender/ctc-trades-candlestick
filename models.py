@@ -2,19 +2,19 @@ import peewee as pw
 import os
 from dateutil import parser
 
-myDB = (pw.MySQLDatabase(
-            os.environ['CTC_CANDLES_DB'],
-            host=os.environ['CTC_CANDLES_HOST'],
-            port=int(os.environ['CTC_CANDLES_PORT']),
-            user=os.environ['CTC_CANDLES_USER'],
-            passwd=os.environ['CTC_CANDLES_PASSWORD']))
-
 # myDB = (pw.MySQLDatabase(
-#             "bcex",
-#             host="localhost",
-#             port=3306,
-#             user="root",
-#             passwd="password"))
+#             os.environ['CTC_CANDLES_DB'],
+#             host=os.environ['CTC_CANDLES_HOST'],
+#             port=int(os.environ['CTC_CANDLES_PORT']),
+#             user=os.environ['CTC_CANDLES_USER'],
+#             passwd=os.environ['CTC_CANDLES_PASSWORD']))
+
+myDB = (pw.MySQLDatabase(
+            "bcex",
+            host="localhost",
+            port=3306,
+            user="root",
+            passwd="password"))
 
 class MySQLModel(pw.Model):
     """A base model that will use our MySQL database"""
@@ -32,6 +32,7 @@ class Candle(MySQLModel):
     volume = pw.DecimalField(null=True, max_digits=20, decimal_places=8)
     idfrom = pw.IntegerField(null=True)
     idto = pw.IntegerField(null=True)
+    candle_date_time = pw.CharField(null=True)
 
 class BitfinexCandle(Candle):
     class Meta:

@@ -1,6 +1,6 @@
-from candleManager import *
+from candle_creator import *
 from models import *
 
-creator = CandleCreator(GdaxCandle, 60)
-manager = CandleManager(creator, GdaxTrade, "GDAX")
-manager.run()
+manager = CandleManager(GdaxCandle, 60)
+creator = CandleCreator(manager, GdaxTrade, "GDAX")
+creator.run()

@@ -1,6 +1,6 @@
-from candleManager import *
+from candle_creator import *
 from models import *
 
-creator = CandleCreator(BitfinexCandle, 60)
-manager = CandleManager(creator, BitfinexTrade, "Bitfinex")
-manager.run()
+manager = CandleManager(BitfinexCandle, 60)
+creator = CandleCreator(manager, BitfinexTrade, "Bitfinex")
+creator.run()

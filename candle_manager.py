@@ -4,7 +4,7 @@ import os
 import time
 from models import *
 
-class CandleCreator(object):
+class CandleManager(object):
 
     def __init__(self, candleClass, frequency):
         self.candleClass = candleClass
@@ -18,7 +18,8 @@ class CandleCreator(object):
             if candle.lastTrade:
                 candle.idto = candle.lastTrade.id
                 candle.close = candle.lastTrade.trade_px
-                candles.append(candle) # candle full and can be appended
+                candle.candle_date_time = candle.lastTrade.trades_date_time
+                candles.append(candle) # append / insert
                 #print candle.__dict__
 
             candle = self.candleClass()

@@ -1,6 +1,6 @@
-from candleCreator import *
+from candle_manager import *
 
-class CandleManager(object):
+class CandleCreator(object):
     def __init__(self, creator, exchangeTrade, exchange):
         self.creator = creator
         self.exchangeTrade = exchangeTrade
@@ -23,4 +23,4 @@ class CandleManager(object):
             (candles, candle) = self.creator.insertCandles(myDB, trades)
             print str(len(candles)) + " Candles written to DB."
             if len(candles) == 0:
-                time.sleep(5)
+                time.sleep(10)
