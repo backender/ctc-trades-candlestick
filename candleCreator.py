@@ -1,57 +1,72 @@
 import peewee as pw
+from datetime import datetime, timedelta
+import os
+import time
+from models import *
 
-myDB = pw.MySQLDatabase("bcex", host="localhost", port=3306, user="root", passwd="password")
+class CandleCreator(object):
 
-class MySQLModel(pw.Model):
-    """A base model that will use our MySQL database"""
-    class Meta:
-        database = myDB
+    def __init__(self, candleClass, frequency):
+        self.candleClass = candleClass
+        self.frequency = frequency
 
-class Trade(MySQLModel):
-    a1 = pw.DecimalField(null=True)
-    a2 = pw.DecimalField(null=True)
-    a3 = pw.DecimalField(null=True)
-    a4 = pw.DecimalField(null=True)
-    a5 = pw.DecimalField(null=True)
-    aq1 = pw.DecimalField(null=True)
-    aq2 = pw.DecimalField(null=True)
-    aq3 = pw.DecimalField(null=True)
-    aq4 = pw.DecimalField(null=True)
-    aq5 = pw.DecimalField(null=True)
-    b1 = pw.DecimalField(null=True)
-    b2 = pw.DecimalField(null=True)
-    b3 = pw.DecimalField(null=True)
-    b4 = pw.DecimalField(null=True)
-    b5 = pw.DecimalField(null=True)
-    bq1 = pw.DecimalField(null=True)
-    bq2 = pw.DecimalField(null=True)
-    bq3 = pw.DecimalField(null=True)
-    bq4 = pw.DecimalField(null=True)
-    bq5 = pw.DecimalField(null=True)
-    #exchange = pw.CharField()
-    instmt = "BTCUSD"
-    order_date_time = pw.CharField(null=True)
-    trade_px = pw.DecimalField(null=True)
-    trade_volume = pw.DecimalField(null=True)
-    trades_date_time = pw.CharField(null=True)
-    update_type = pw.IntegerField(null=True)
+    def withinCandle(self, trade, firstTrade, frequency = 60):
+        return (trade.tradeDate() - firstTrade.tradeDate()).total_seconds() > frequency
 
-class GdaxTrade(Trade):
-    exchange = "GDAX"
-    class Meta:
-        db_table = 'exch_gdax_btcusd_snapshot_20170718'
+    def addTrade(self, trade, candles, candle):
+        if not candle.lastTrade or self.withinCandle(trade, candle.firstTrade, self.frequency):
+            if candle.lastTrade:
+                candle.idto = candle.lastTrade.id
+                candle.close = candle.lastTrade.trade_px
+                candles.append(candle) # candle full and can be appended
+                #print candle.__dict__
 
-class BitfinexTrade(Trade):
-    exchange = "Bitfinex"
-    class Meta:
-        db_table = 'exch_bitfinex_btcusd_snapshot_20170718'
+            candle = self.candleClass()
+            candle.firstTrade = trade
+            candle.trades = 1
+            candle.idfrom = trade.id
+            candle.open = trade.trade_px
+            candle.volume = trade.trade_volume
+            candle.low = trade.trade_px
+            candle.high = trade.trade_px
+        else:
+            candle.trades = candle.trades + 1
+            candle.volume = candle.volume + trade.trade_volume
+            if candle.low > trade.trade_px:
+                candle.low = trade.trade_px
+            if candle.high < trade.trade_px:
+                candle.high = trade.trade_px
 
-class BitstampTrade(Trade):
-    exchange = "Bitstamp"
-    class Meta:
-        db_table = 'exch_bitstamp_btcusd_snapshot_20170718'
+        candle.lastTrade = trade
+        return (candles, candle)
 
-myDB.connect()
+    def createCandles(self, trades):
+        candle = self.candleClass()
+        candles = []
+        for trade in trades:
+            candles, candle = self.addTrade(trade, candles, candle)
+        return (candles, candle)
 
-for trade in BitfinexTrade.select():
-    print trade.trade_px
+    def insert(self, db, candles):
+        with db.atomic():
+            cs = map(lambda c: (c.__dict__)['_data'], candles)
+            self.candleClass.insert_many(cs).execute()
+
+    def insertCandlesBulk(self, db, trades, bulk):
+        candle = self.candleClass()
+        candles = []
+        candlesTmp = []
+        for trade in trades:
+            candlesTmp, candle = self.addTrade(trade, candlesTmp, candle)
+            if len(candlesTmp) >= bulk:
+                self.insert(db, candlesTmp)
+                candles = candles + candlesTmp
+                candlesTmp = []
+        # Bulk leftover which are still valid candles
+        if candlesTmp:
+            self.insert(db, candlesTmp)
+            candles.append(candlesTmp)
+        return (candles, candle)
+
+    def insertCandles(self, db, trades):
+        return self.insertCandlesBulk(db, trades, 1)
