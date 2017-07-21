@@ -8,6 +8,8 @@ class CandleManager(object):
 
     def __init__(self, candleClass, frequency):
         self.candleClass = candleClass
+        self.table_name = self.candleClass._meta.db_table + str(frequency)
+        self.candleClass._meta.db_table = self.table_name #improve
         self.frequency = frequency
 
     def withinCandle(self, trade, firstTrade, frequency = 60):
@@ -23,6 +25,7 @@ class CandleManager(object):
                 #print candle.__dict__
 
             candle = self.candleClass()
+            candle._meta.db_table = self.table_name
             candle.firstTrade = trade
             candle.trades = 1
             candle.idfrom = trade.id

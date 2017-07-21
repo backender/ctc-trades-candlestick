@@ -36,15 +36,15 @@ class Candle(MySQLModel):
 
 class BitfinexCandle(Candle):
     class Meta:
-        db_table = 'exch_bitfinex_btcusd_candles_1m'
+        db_table = 'exch_bitfinex_btcusd_candles_'
 
 class BitstampCandle(Candle):
     class Meta:
-        db_table = 'exch_bitstamp_btcusd_candles_1m'
+        db_table = 'exch_bitstamp_btcusd_candles_'
 
 class GdaxCandle(Candle):
     class Meta:
-        db_table = 'exch_gdax_btcusd_candles_1m'
+        db_table = 'exch_gdax_btcusd_candles_'
 
 class Trade(MySQLModel):
     a1 = pw.DecimalField(null=True)
