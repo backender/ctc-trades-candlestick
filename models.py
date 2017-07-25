@@ -38,11 +38,23 @@ class BitfinexCandle(Candle):
     class Meta:
         db_table = 'exch_bitfinex_btcusd_candles_'
 
+class BitfinexCandleBase(Candle):
+    class Meta:
+        db_table = 'exch_bitfinex_btcusd_candles_'
+
 class BitstampCandle(Candle):
     class Meta:
         db_table = 'exch_bitstamp_btcusd_candles_'
 
+class BitstampCandleBase(Candle):
+    class Meta:
+        db_table = 'exch_bitstamp_btcusd_candles_'
+
 class GdaxCandle(Candle):
+    class Meta:
+        db_table = 'exch_gdax_btcusd_candles_'
+
+class GdaxCandleBase(Candle):
     class Meta:
         db_table = 'exch_gdax_btcusd_candles_'
 

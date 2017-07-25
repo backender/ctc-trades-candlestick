@@ -25,15 +25,21 @@ class SubscriptionManager:
         :return Instrument object
         """
         exchange_name = self.config.get(instmt_id, 'exchange')
+        candle_table = self.config.get(instmt_id, 'candle_table')
         frequency = self.config.get(instmt_id, 'frequency')
         enabled = int(self.config.get(instmt_id, 'enabled'))
+        base = self.config.get(instmt_id, 'base')
+        base_table = self.config.get(instmt_id, 'base_table')
         params = dict(self.config.items(instmt_id))
         del params['exchange']
+        del params['candle_table']
         del params['frequency']
         del params['enabled']
+        del params['base']
+        del params['base_table']
 
         if enabled == 1:
-            return Instrument(exchange_name, int(frequency), **params)
+            return Instrument(exchange_name, candle_table, int(frequency), base, base_table, **params)
         else:
             return None
 
