@@ -71,7 +71,7 @@ class CandleCreator(object):
                 candles.append(candle) # append / insert
                 del baseCandles[0]
 
-            print "Total inserted in ("+self.baseObject()._meta.db_table+"): " + str(len(candles))
+            print "Total inserted in ("+self.manager.candleClass._meta.db_table+"): " + str(len(candles))
             if len(candles) == 0:
                 time.sleep(10)
             else:
