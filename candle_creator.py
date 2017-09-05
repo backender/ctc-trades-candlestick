@@ -8,7 +8,7 @@ class CandleCreator(object):
 
     def run(self):
         self.manager.candleClass.create_table(True)
-        batch = 10000*int(self.manager.frequency)/60 # make configurable
+        batch = 100000*int(self.manager.frequency)/60 # make configurable
 
         while True:
             try:
